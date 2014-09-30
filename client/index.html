@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- dependencies -->
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/underscore/underscore-min.js"></script>
+    <!-- your scripts -->
+    <script src="scripts/config.js"></script>
+    <script src="scripts/app.js"></script>
+  </head>
+  <body style="background-color: #33CCFF">
+    <div id="main">
+      <ul class = 'rooms'>
+      </ul>
+      <form id="send">
+        <h1>chatterbox</h1>
+        <!--<span>Your name:</span>-->
+        <!--<input type = "text" id = "username">-->
+        <input type="text" id = "message">
+        <button id="sendButton">Send</button>
+        <span class = 'progressbar'><img src = "images/bar.gif"></span>
+
+      </form>
+      <div id='chats'></div>
+      <!-- Your HTML goes here! -->
+    </div>
+    <script>
+      $(function(){
+        app.init();
+      });
+    </script>
+  </body>
+</html>
