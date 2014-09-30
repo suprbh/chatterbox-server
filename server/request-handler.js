@@ -15,7 +15,6 @@ exports.handleRequest = function(request, response) {
 
   console.log("Serving request type " + request.method + " for url " + request.url );
 
-  var statusCode = 200;
   /* Without this line, this server wouldn't work. See the note
    * below about CORS. */
   var headers = defaultCorsHeaders;
@@ -24,36 +23,37 @@ exports.handleRequest = function(request, response) {
 
   /* .writeHead() tells our server what HTTP status code to send back */
 
-  var parseURL = request.url.split('/'); // Gives array of paths
-
-  if(request.method === 'GET') {
-    // Look at storage of chat messages,
+  // var parseURL = request.url.split('/'); // Gives array of paths
+  var testPath = "/classes/messages";
+  if (request.url !== testPath) {
+    statusCode = 404;
     response.writeHead(statusCode, headers);
-    var res = {};
-    // res.results = [];
-    res.results = resArray;
+  } else {
+      if(request.method === 'GET') {
+      // Look at storage of chat messages,
+      var statusCode = 200;
+      response.writeHead(statusCode, headers);
+      var res = {};
+      res.results = resArray;
+      response.write(JSON.stringify({results: resArray}));
 
-    // response.write(JSON.stringify({results: results}));
-    response.write(JSON.stringify(res));
-  } else if (request.method === 'POST') {
+    } else if (request.method === 'POST') {
+      statusCode = 201;
+      response.writeHead(statusCode, headers);
+      var body = '';
+      request.on('data', function(chunk) {
+        body += chunk;
+        if(body.length > 10000) {
+          request.connection.destroy();
+        }
+         // console.log('req body: ', JSON.parse(body));
+         resArray.push(JSON.parse(body));
+      });
+    } else if (request.method === 'PUT') {
 
-    statusCode = 201;
-    response.writeHead(statusCode, headers);
-    // results.push();
-    var body = '';
-    request.on('data', function(chunk) {
-      body += chunk;
-      if(body.length > 1e6) {
-        request.connection.destroy();
-      }
-      console.log('req body: ', body);
-      resArray.push(body);
-    });
-    // response.write(JSON.stringify({results: 'hello world'}));
-  } else if (request.method === 'PUT') {
+    } else if (request.method === 'DELETE') {
 
-  } else if (request.method === 'DELETE') {
-
+    }
   }
 
   /* Make sure to always call response.end() - Node will not send
