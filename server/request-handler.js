@@ -5,76 +5,9 @@
  * this file and include it in basic-server.js so that it actually works.
  * *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html. */
 var resArray = [];
-var roomArray = [];
 var exports = module.exports = {};
 
-var processMessageRequest = function(request, response, headers){
-  if(request.method === 'GET') {
-      // Look at storage of chat messages,
-      var statusCode = 200;
-      response.writeHead(statusCode, headers);
-      var res = {};
-      res.results = resArray;
-      response.write(JSON.stringify({results: resArray}));
-      response.end();
-
-    } else if (request.method === 'POST') {
-      statusCode = 201;
-      response.writeHead(statusCode, headers);
-      var body = '';
-      request.on('data', function(chunk) {
-        body += chunk;
-        if(body.length > 10000) {
-          request.connection.destroy();
-        }
-         // console.log('req body: ', JSON.parse(body));
-         resArray.push(JSON.parse(body));
-      });
-      response.end();
-
-    } else if (request.method === 'PUT') {
-
-
-
-    } else if (request.method === 'DELETE') {
-
-  }
-};
-
-var processRoomRequest = function(request, response, headers){
-  console.log("Here 1");
-  if(request.method === 'GET') {
-    // Look at storage of chat messages,
-    var statusCode = 200;
-    console.log("Here 2");
-    response.writeHead(statusCode, headers);
-    var res = {};
-    res.results = roomArray;
-    response.write(JSON.stringify({results: roomArray}));
-    response.end();
-
-  } else if (request.method === 'POST') {
-    statusCode = 201;
-    response.writeHead(statusCode, headers);
-    var body = '';
-    request.on('data', function(chunk) {
-      body += chunk;
-      if(body.length > 10000) {
-        request.connection.destroy();
-      }
-       roomArray.push(JSON.parse(body));
-    });
-    response.end();
-
-  } else if (request.method === 'PUT') {
-
-  } else if (request.method === 'DELETE') {
-
-  }
-
-};
-
-exports.handleRequest = function(request, response) {
+exports.handler = function(request, response) {
   /* the 'request' argument comes from nodes http module. It includes info about the
   request - such as what URL the browser is requesting. */
 
@@ -96,16 +29,44 @@ exports.handleRequest = function(request, response) {
   var roomPath = "/classes/room";
   var roomPath1 = "/classes/room1";
 
-  console.log(request.url+ ":" + messagesPath +":"+ roomPath);
-  if(request.url === messagesPath)
+  if((request.url === messagesPath) || (request.url === roomPath) || (request.url === roomPath1))
   {
     // Process requests
-    console.log("Here 3");
-    processMessageRequest(request, response, headers);
+    if (request.method.toUpperCase() === 'OPTIONS'){
+      statusCode = 204;
+      response.writeHead(statusCode, 'No Content Found', headers);
+      response.end();
 
-  } else if ((request.url === roomPath) || (request.url === roomPath1)){
-    console.log("Here 4");
-    processRoomRequest(request, response, headers);
+    } else {
+
+      if(request.method === 'GET') {
+      // Look at storage of chat messages,
+        var statusCode = 200;
+
+        response.writeHead(statusCode, headers);
+        var res = {};
+        res.results = resArray;
+        response.end(JSON.stringify({results: resArray}));
+
+      } else if (request.method === 'POST') {
+        statusCode = 201;
+        response.writeHead(statusCode, headers);
+        var body = '';
+        request.on('data', function(chunk) {
+          body += chunk;
+          if(body.length > 10000) {
+            request.connection.destroy();
+          }
+           resArray.push(JSON.parse(body));
+        });
+        response.end();
+
+      } else if (request.method === 'PUT') {
+
+      } else if (request.method === 'DELETE') {
+
+      }
+    }
 
   } else {
     statusCode = 404;
@@ -119,7 +80,7 @@ exports.handleRequest = function(request, response) {
    * response.end() will be the body of the response - i.e. what shows
    * up in the browser.*/
 
-  // response.end();
+
 };
 
 /* These headers will allow Cross-Origin Resource Sharing (CORS).
@@ -133,3 +94,4 @@ var defaultCorsHeaders = {
   "access-control-allow-headers": "content-type, accept",
   "access-control-max-age": 10 // Seconds.
 };
+
