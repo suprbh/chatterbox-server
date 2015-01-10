@@ -1,32 +1,27 @@
 var app = {
   rooms: [],
-  server: 'http://127.0.0.1:3000/classes/chatterbox',
+  server: 'http://127.0.0.1:3000/classes/messages?order=-createdAt',
+
   init: function(){
-
-
-    // $('#main').on('click', '.username', function(){
-    //   app.addFriend();
-    // });
-
+    app.username = window.location.search.substr(10);
     setInterval(function(){
       app.clearMessages();
       app.fetch();
-    }, 2000);
+    }, 5000);
 
     $('#sendButton').on('click', app.handleSubmit);
     // onclick class .username invoke this.addFriend();
   },
   send: function(message){
-      console.log('inside send');
+    console.log('inside send');
     $.ajax({
   // always use this url
-      url: 'http://127.0.0.1:3000/classes/chatterbox',
+      url: 'http://127.0.0.1:3000/classes/messages?order=-createdAt',
       type: 'POST',
       data: JSON.stringify(message),
-      dataType: "json",
       contentType: 'application/json',
       success: function (data) {
-        console.log('chatterbox: Message sent');
+        console.log('messages: Message sent');
       },
       error: function (e) {
         // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -34,37 +29,36 @@ var app = {
       }
     });
   },
-  makeRoomList: function(data){
-    for(var index =0; index < data.results.length; index++){
-      if (app.rooms.indexOf(data.results[index].roomname) === -1){
-        app.rooms.push(data.results[index].roomname);
-      }
-    }
-    var roomList = $('ul.mylist');
-    $.each(app.rooms, function(index){
-      console.log(app.rooms[index]);
-      var li = $('<li/>')
-        .addClass('ui-room-item')
-        .text(app.rooms[index])
-    //     .appendTo(app.rooms[index]);
-    });
-    console.log(roomList);
-    app.displayRooms(roomList);
-  },
-  displayRooms: function(list){
-    list.appendTo('#main');
-  },
+  // makeRoomList: function(data){
+  //   for(var index =0; index < data.results.length; index++){
+  //     if (app.rooms.indexOf(data.results[index].roomname) === -1){
+  //       app.rooms.push(data.results[index].roomname);
+  //     }
+  //   }
+  //   var roomList = $('ul.mylist');
+  //   $.each(app.rooms, function(index){
+  //     console.log(app.rooms[index]);
+  //     var li = $('<li/>')
+  //       .addClass('ui-room-item')
+  //       .text(app.rooms[index])
+  //   //     .appendTo(app.rooms[index]);
+  //   });
+  //   app.displayRooms(roomList);
+  // },
+  // displayRooms: function(list){
+  //   list.appendTo('#main');
+  // },
   fetch: function(){
     $.ajax({
-  // always use this url
-      // url: 'http://127.0.0.1:3000/classes/chatterbox?order=-createdAt',
-      url: 'http://127.0.0.1:3000/classes/chatterbox',
+      // url: 'http://127.0.0.1:3000/classes/messages?order=-createdAt',
+      url: 'http://127.0.0.1:3000/classes/messages?order=-createdAt',
       type: 'GET',
       contentType: 'application/json',
       success: function (data) {
+        console.log(data);
         //displayMessages(data)
-        console.log('DATA', data.results);
-        app.makeRoomList(data);
+        // var parseData = JSON.parse(data);
+        // app.makeRoomList(data);
         for(var index =0; index < data.results.length; index++){
           app.addMessage(data.results[index]);
           // console.log(data.results[index]);
@@ -72,14 +66,14 @@ var app = {
       },
       error: function (data) {
         // see: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-        console.error('chatterbox: Failed to get message');
+        console.error('messages: Failed to get message');
       }
     });
   },
-  // server: 'https://127.0.0.1:3000/classes/chatterbox?order=-createdAt',
-  // server: 'https://127.0.0.1:3000/classes/chatterbox?order=-createdAt',
+  // server: 'https://127.0.0.1:3000/classes/messages?order=-createdAt',
+  // server: 'https://127.0.0.1:3000/classes/messages?order=-createdAt',
   clearMessages: function(){
-    $('#chats blink').remove();
+    $('#chats div').remove();
   },
   addMessage: function(message){
     // var $userlink = $().text(message.username);
@@ -91,26 +85,21 @@ var app = {
     // if (array.indexOf())
     // array.push(message.roomname)
   },
-  addRoom: function(message){
-    $('#roomSelect').append('<span>' + app.escapeHTML(message.roomname));
-  },
-  addFriend: function(){},
+  // addRoom: function(message){
+  //   $('#roomSelect').append('<span>' + app.escapeHTML(message.roomname));
+  // },
+  // addFriend: function(){},
   handleSubmit: function(){
     console.log("HandleSubmit");
     var message = {
       text: $('#message').val(),
-      username: '123abc',
+      // username: '123abc',
+      username: app.username,
       roomname:'6th Floor'
     };
-    console.log(message);
+    // console.log(message);
     app.send(message);
-  },
- refreshMessages: function(){
-  setInterval(function(){
-    app.clearMessages();
-    app.fetch();
-  }, 3000);
- }
+  }
 };
 
 

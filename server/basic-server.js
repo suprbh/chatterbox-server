@@ -1,5 +1,8 @@
 /* Import node's http module: */
 var http = require("http");
+var url = require('url');
+var utils = require('./utils.js')
+
 var handler = require('./request-handler.js');
 
 
@@ -14,15 +17,28 @@ var port = 3000;
  * special address that always refers to localhost. */
 var ip = "127.0.0.1";
 
+var routes = {
+  "/classes/messages": handler.handler,
+  "/classes/room" : handler.handler
+};
 
+var server = http.createServer(function(request, response){
+  var path = url.parse(request.url);
+  var route = routes[path.pathname];
+  if (route){
+    route(request, response);
+  } else {
+    utils.sendResponse(response, null, 404);
+  }
+});
 
+console.log("Listening on http://" + ip + ":" + port);
+server.listen(port, ip);
 /* We use node's http module to create a server. Note, we called it 'server', but
 we could have called it anything (myServer, blahblah, etc.). The function we pass it (handleRequest)
 will, unsurprisingly, handle all incoming requests. (ps: 'handleRequest' is in the 'request-handler' file).
 Lastly, we tell the server we made to listen on the given port and IP. */
-var server = http.createServer(handler.handler);
-console.log("Listening on http://" + ip + ":" + port);
-server.listen(port, ip);
+
 
 /* To start this server, run:
      node basic-server.js
